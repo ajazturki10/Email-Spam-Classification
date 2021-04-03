@@ -3,11 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import nltk
 import string
+import joblib
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import precision_score, recall_score, confusion_matrix
 
 #Read the data
 df = pd.read_csv('CSV/spam_ham.csv', encoding = 'iso-8859-1')
@@ -77,27 +79,19 @@ grid.fit(X, y)
 best_nb_model = grid.best_estimator_
 
 best_nb_model.fit(X_train, y_train)
+final_pred = best_bn_model.predict(X_test)
+
+#Performance matrix
+def confusion_mat(y_true, y_pred):
+    print("Precision Score : ", precision_score(y_true, y_pred))
+    print("Recall Score : ", recall_score(y_true, y_pred))
+    print("Confusion Matrix : \n", confusion_matrix(y_true, y_pred))
+
+print(confusion_mat(y_test, final_pred))
 
 
-def take_input():
-    review = str(input('Type the Mail : '))
-    return [review]
+#saving the model
+joblib.dump(best_nb_model, 'spam_classifier.pkl')
 
-
-def classify_spam(review, take_input = False):
-    if take_input == True:
-        review = take_input()
-        
-    else:
-        review = review
-
-    rev = vect.transform(review)
-    preds = best_nb_model.predict(rev)
-     
-    if preds == 1:
-        print('Email : Ham')
-        
-    else:
-        print('Email : Spam')
         
 
